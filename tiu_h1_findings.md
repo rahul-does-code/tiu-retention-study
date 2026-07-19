@@ -2,25 +2,31 @@
 
 ## Executive summary
 
-The TIU's per-block retention policy is headed to silicon, and this study models it
-in software to answer which importance signal it should accumulate and how it should
-treat cold blocks. Two findings are decision-relevant for the CSR default. **First:
-routing policy cannot be validated on short-context benchmarks** — on HellaSwag every
-policy ties, because 4-bit KV is lossless at this model scale, so the evaluation is
-uninformative. **Second, at the spec's long-context configuration (128 tracked blocks,
-2048 tokens), the policy choice is decisive:** attention-accumulation routing beats a
-random baseline by 2–4× perplexity and beats naive FIFO eviction by roughly 40×. The
-best cold-block fate is *conditional* — evicting cold blocks wins when routing is good
-and loses badly when it isn't — which yields a specific recommendation: default to the
-attention-accumulation signal, and only default to eviction when that signal is active;
-otherwise demote, which bounds worst-case damage. Full method, tables, and the hardware
-caveats (notably an oracle-lookahead limitation in the signal) are below.
+The TIU accumulates a running importance score per cached token and uses it for
+mixed-precision retention; per its public description, cold tokens are "evicted or
+compressed to 2-bit." This study models that retention policy in software — at
+16-token-block granularity — to answer which importance signal the TIU should
+accumulate and, directly, the evict-or-compress choice its spec leaves open. Two
+findings are decision-relevant. **First: routing policy cannot be validated on
+short-context benchmarks** — on HellaSwag every policy ties, because 4-bit KV is
+lossless at this model scale, so the evaluation is uninformative. **Second, at long
+context (up to 2048 tokens = 128 blocks, the eval model's full window), the policy
+choice is decisive:** attention-accumulation routing beats a random baseline by 2–4×
+perplexity and beats naive FIFO eviction by roughly 40×. The best cold-block fate is
+*conditional* — evicting cold blocks wins when routing is good and loses badly when
+it isn't — which yields a specific recommendation: default to the attention-accumulation
+signal, and only default to eviction when that signal is active; otherwise demote,
+which bounds worst-case damage. These directions are consistent with the H2O /
+StreamingLLM literature; the contribution here is the matched-budget quantification at
+this configuration inside the org's own codebase, plus the routing×fate interaction.
+Full method, tables, and hardware caveats (notably an oracle-lookahead limitation in
+the signal, and an eviction-approximation caveat) are below.
 
 ---
 
 **Status:** COMPLETE (software model; hardware-fidelity caveats below)
 **Scope:** SmolLM-360M, per-16-token-block KV retention, matched memory budgets
-**Benchmarks:** HellaSwag (short context, ~8 blocks) + WikiText-2 perplexity (1024 and 2048 tokens = 64 and 128 blocks; 2048 matches the TIU spec's 128 tracked blocks exactly)
+**Benchmarks:** HellaSwag (short context, ~8 blocks) + WikiText-2 perplexity (1024 and 2048 tokens = 64 and 128 blocks; 2048 is the eval model's full context window)
 **Repos:** builds on `dont-waste-bits` (hooks, quantizers, and eval harness reused unchanged); new code is `tiu_policies.py` + `tiu_longcontext.py`
 **Authorship note:** study designed, run, and validated by Rahul; code and analysis developed with AI assistance (used as a tool). All experiments executed locally on an RTX 4050 (6GB) and checked against in-codebase anchors.
 
@@ -150,7 +156,7 @@ These numbers indict streaming *for whole-context workloads*, not in general.
    it bounds worst-case damage by ~3× where eviction compounds it.
 3. **Do not validate retention policy on short-context benchmarks.** At ≤~8 blocks,
    or at any budget ≥4 bits on a ≤360M-class model, all policies tie and the
-   evaluation is uninformative. Long-context perplexity at the spec's 128-block
+   evaluation is uninformative. Long-context perplexity at the full 128-block
    configuration is the discriminating test.
 
 ## Limitations (read before citing)
@@ -161,13 +167,22 @@ These numbers indict streaming *for whole-context workloads*, not in general.
   are an **upper bound** on the accumulation signal. The margins (2–4× over random)
   are large enough that the ranking plausibly survives a causal version, but that
   version has not been run.
+- **Eviction is approximated by zeroing, not masking.** The evict arm zeroes the
+  k/v projections for evicted positions. A zero key still receives softmax logit 0
+  and therefore absorbs some attention mass, whereas true eviction removes the
+  position and renormalizes over survivors. The policy *ordering* is robust to this
+  (it holds identically under both fates), but demote-vs-evict *margins* could shift
+  under true masked eviction; a mask-based rerun is a cheap follow-up.
 - **Static retention.** Bit assignments are fixed per forward pass; real decode
   updates retention as the sequence grows.
-- **INT2 is a stand-in for CQ-4.** The silicon's cold tier is ChannelQuant CQ-4,
-  not INT2 (a flagged fidelity gap in this harness). Note also that at 360M a
-  4-bit cold tier is *lossless*, so the demote-vs-evict question as the hardware
-  literally poses it cannot be tested at this model scale — the INT2 stand-in is
-  what makes the question answerable in software at all.
+- **Naive INT2 is a pessimistic stand-in for the hardware cold tier.** Per the
+  public architecture description, the cold tier is RotateKV-style 2-bit (outlier-
+  eliminating rotation before quantization) or GEAR-style 4-bit with residual
+  correction; plain INT2 lacks the rotation and is therefore *worse* than the
+  hardware's 2-bit — so the demote arm here understates hardware demotion quality.
+  Note also that at 360M a 4-bit cold tier is lossless, so the 4-bit-demote variant
+  of the question cannot be tested at this model scale; the 2-bit stand-in is what
+  makes the question answerable in software at all.
 - **Scale.** All results are SmolLM-360M. The repo's prior work shows INT4
   losslessness breaks between 360M and 1.7B; margins may shift at deployment scale.
 - **PPL means across chunks are heavy-tailed**; at these gap sizes (10–100+ SEMs)
