@@ -1,0 +1,98 @@
+{
+  "grid": {
+    "tiu_h2o|demote|b3": {
+      "ppl": 126.45,
+      "ppl_sem_across_chunks": 10.091,
+      "delta_vs_fp16": 114.456,
+      "bit_distribution_pct": {
+        "2": 50.0,
+        "4": 50.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_streaming|demote|b3": {
+      "ppl": 271.839,
+      "ppl_sem_across_chunks": 21.508,
+      "delta_vs_fp16": 259.845,
+      "bit_distribution_pct": {
+        "2": 50.0,
+        "4": 50.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_fifo|demote|b3": {
+      "ppl": 494.549,
+      "ppl_sem_across_chunks": 42.945,
+      "delta_vs_fp16": 482.555,
+      "bit_distribution_pct": {
+        "2": 50.0,
+        "4": 50.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_random|demote|b3": {
+      "ppl": 169.361,
+      "ppl_sem_across_chunks": 13.711,
+      "delta_vs_fp16": 157.367,
+      "bit_distribution_pct": {
+        "2": 50.0,
+        "4": 50.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_h2o|evict|b3": {
+      "ppl": 39.464,
+      "ppl_sem_across_chunks": 2.808,
+      "delta_vs_fp16": 27.47,
+      "bit_distribution_pct": {
+        "0": 25.0,
+        "4": 75.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_streaming|evict|b3": {
+      "ppl": 359.94,
+      "ppl_sem_across_chunks": 26.871,
+      "delta_vs_fp16": 347.946,
+      "bit_distribution_pct": {
+        "0": 25.0,
+        "4": 75.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_fifo|evict|b3": {
+      "ppl": 1542.077,
+      "ppl_sem_across_chunks": 125.501,
+      "delta_vs_fp16": 1530.083,
+      "bit_distribution_pct": {
+        "0": 25.0,
+        "4": 75.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    },
+    "tiu_random|evict|b3": {
+      "ppl": 76.526,
+      "ppl_sem_across_chunks": 8.217,
+      "delta_vs_fp16": 64.532,
+      "bit_distribution_pct": {
+        "0": 25.0,
+        "4": 75.0
+      },
+      "avg_bits": 3.0,
+      "n_chunks": 15
+    }
+  },
+  "fp16_ppl": 11.994,
+  "seq_len": 2048,
+  "n_chunks": 15,
+  "elapsed_s": 107.83180141448975,
+  "note": "Long-context companion to the HellaSwag grid. PPL lower=better. Compare cells only within this run (same chunks, same anchor).",
+  "date": "2026-07-18T18:38:19.723145"
+}

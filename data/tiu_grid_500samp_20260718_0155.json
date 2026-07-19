@@ -1,0 +1,87 @@
+{
+  "grid": {
+    "tiu_h2o|demote|b3": {
+      "accuracy": 35.8,
+      "correct": 179,
+      "total": 500,
+      "bit_distribution_pct": {
+        "2": 31.7,
+        "4": 68.3
+      },
+      "avg_bits": 3.37
+    },
+    "tiu_streaming|demote|b3": {
+      "accuracy": 36.0,
+      "correct": 180,
+      "total": 500,
+      "bit_distribution_pct": {
+        "2": 43.0,
+        "4": 57.0
+      },
+      "avg_bits": 3.14
+    },
+    "tiu_fifo|demote|b3": {
+      "accuracy": 33.4,
+      "correct": 167,
+      "total": 500,
+      "bit_distribution_pct": {
+        "2": 55.6,
+        "4": 44.4
+      },
+      "avg_bits": 2.89
+    },
+    "tiu_random|demote|b3": {
+      "accuracy": 35.8,
+      "correct": 179,
+      "total": 500,
+      "bit_distribution_pct": {
+        "2": 43.9,
+        "4": 56.1
+      },
+      "avg_bits": 3.12
+    },
+    "tiu_h2o|evict|b3": {
+      "accuracy": 41.8,
+      "correct": 209,
+      "total": 500,
+      "bit_distribution_pct": {
+        "0": 7.4,
+        "4": 92.6
+      },
+      "avg_bits": 3.71
+    },
+    "tiu_streaming|evict|b3": {
+      "accuracy": 41.6,
+      "correct": 208,
+      "total": 500,
+      "bit_distribution_pct": {
+        "0": 18.7,
+        "4": 81.3
+      },
+      "avg_bits": 3.25
+    },
+    "tiu_fifo|evict|b3": {
+      "accuracy": 40.400000000000006,
+      "correct": 202,
+      "total": 500,
+      "bit_distribution_pct": {
+        "0": 18.7,
+        "4": 81.3
+      },
+      "avg_bits": 3.25
+    },
+    "tiu_random|evict|b3": {
+      "accuracy": 41.0,
+      "correct": 205,
+      "total": 500,
+      "bit_distribution_pct": {
+        "0": 14.8,
+        "4": 85.2
+      },
+      "avg_bits": 3.41
+    }
+  },
+  "elapsed_s": 9263.355949401855,
+  "anchor_note": "reimpl anchor DWB 33.8% / FP16 42.6%, same codebase; INT4 lossless at 360M so ties at loose budgets are expected",
+  "date": "2026-07-18T01:55:48.969462"
+}
