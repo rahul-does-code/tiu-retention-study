@@ -46,6 +46,5 @@ All runs completed on a single 6GB GPU (RTX 4050).
 ## Authorship
 
 Study designed, run, and validated by Rahul (`rahul-does-code`). Code and analysis
-developed with AI assistance (used as a tool, as one would use any library or
-framework); all experiments were executed locally and all results independently
+developed with AI assistance (big up Claude); all experiments were executed locally and all results independently
 checked against in-codebase anchors.
